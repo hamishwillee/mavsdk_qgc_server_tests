@@ -15,6 +15,7 @@ Usage:
 
   --port PORT   UDP port QGC listens on (default: 14550)
   --count N     Number of battery instances (default: 1)
+  --fast        Cycle battery 5× faster (useful for testing LOW/CRITICAL alerts)
 """
 
 import argparse
@@ -615,9 +616,21 @@ async def run(args):
         print("    [AUTO] Starting with BATTERY_STATUS only. Waiting for QGC to request V2…")
 
     tick = 0
+    # Normal: 1% per 2 s  → 95%→5% in ~180 s (3 min), cycle every 181 ticks
+    # Fast:   3% per tick → 95%→5% in ~30 s,           cycle every 31 ticks
+    if args.fast:
+        cycle_ticks = 31
+        cycle_step  = 3
+    else:
+        cycle_ticks = 181
+        cycle_step  = None  # uses (tick % 181) // 2 for 0.5%/s
     try:
         while True:
-            percent = max(5, 95 - (tick % 180) // 2)
+            t = tick % cycle_ticks
+            if args.fast:
+                percent = max(5, 95 - t * cycle_step)
+            else:
+                percent = max(5, 95 - t // 2)
 
             for bid in range(args.count):
                 voltage, current, consumed_ah, remaining_ah = simulate(percent)
@@ -698,6 +711,8 @@ def main():
                         help='(V2) Skip BATTERY_INFO (no full_charge_capacity → inference disabled)')
     parser.add_argument('--port',  type=int, default=14550)
     parser.add_argument('--count', type=int, default=1, help='Number of battery instances')
+    parser.add_argument('--fast',  action='store_true',
+                        help='Cycle battery 5× faster (95%%→5%% in ~36 s) for alert threshold testing')
     args = parser.parse_args()
 
     if not args.v1 and not args.v2 and not args.auto:

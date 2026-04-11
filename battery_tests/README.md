@@ -4,15 +4,16 @@ Tests for QGC's battery display, covering BATTERY_STATUS (legacy V1), BATTERY_ST
 
 ## What is tested
 
-| Mode             | Messages sent                                       | What QGC should show                                                                                      |
-| ---------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `--v1`           | BATTERY_STATUS (id=147)                             | Legacy battery widget: %, voltage, current, mAh                                                           |
-| `--v2`           | BATTERY_STATUS_V2 (id=369) + BATTERY_INFO (id=372)  | V2 widget: %, voltage, current, capacity remaining/consumed, status flags, serial number, etc.            |
-| `--v2 --fault`   | BATTERY_STATUS_V2 with fault flags set              | Battery widget shows FAILED charge state / fault indication                                               |
-| `--v2 --no-info` | BATTERY_STATUS_V2 only, no BATTERY_INFO             | V2 widget without static info (capacity remaining is inferred from percent, not capacity_remaining field) |
-| `--auto`         | Starts V1; switches to V2+INFO when QGC requests it | Widget transitions from V1 → V2 after ~5–15 s                                                             |
-| `--v1 --v2`      | Both simultaneously                                 | QGC prefers V2 once negotiation completes                                                                 |
-| `--count 2`      | Two battery instances (id=0 and id=1)               | Two battery entries in the widget                                                                         |
+| Mode                   | Messages sent                                       | What QGC should show                                                                                      |
+| ---------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `--v1`                 | BATTERY_STATUS (id=147)                             | Legacy battery widget: %, voltage, current, mAh                                                           |
+| `--v2`                 | BATTERY_STATUS_V2 (id=369) + BATTERY_INFO (id=372)  | V2 widget: %, voltage, current, capacity remaining/consumed, status flags, serial number, etc.            |
+| `--v2 --fault`         | BATTERY_STATUS_V2 with fault flags set              | Battery widget shows FAILED charge state / fault indication                                               |
+| `--v2 --no-info`       | BATTERY_STATUS_V2 only, no BATTERY_INFO             | V2 widget without static info (capacity remaining is inferred from percent, not capacity_remaining field) |
+| `--auto`               | Starts V1; switches to V2+INFO when QGC requests it | Widget transitions from V1 → V2 after ~5–15 s                                                             |
+| `--v1 --v2`            | Both simultaneously                                 | QGC prefers V2 once negotiation completes                                                                 |
+| `--count 2`            | Two battery instances (id=0 and id=1)               | Two battery entries in the widget                                                                         |
+| `--v2 --fast`          | BATTERY_STATUS_V2 cycling 95%→5% in ~30 s          | LOW voice alert at ~25% (~24 s in), CRITICAL at ~10% (~29 s in)                                          |
 
 ## Prerequisites
 
@@ -49,6 +50,9 @@ python3 battery_test_mavsdk.py --v2 --no-info
 # Two batteries
 python3 battery_test_mavsdk.py --v2 --count 2
 
+# Fast cycle to test LOW/CRITICAL voice alerts (95%→5% in ~30 s)
+python3 battery_test_mavsdk.py --v2 --fast
+
 # Custom QGC port
 python3 battery_test_mavsdk.py --v1 --port 14551
 ```
@@ -68,8 +72,10 @@ Press **Ctrl+C** to stop.
   - Voltage, current, % remaining
   - `capacityRemaining` (Ah) — alternates between provided and inferred every 4 ticks
   - Static info from BATTERY_INFO: serial number `SN-1000`, name `Acme_LiPo4S5000`, 4 cells, SOH 92 %, cycle count 47
-  - `chargeState` = OK (no fault flags)
+  - `chargeState` = OK (no fault flags) while battery > 25 %
 - BATTERY_STATUS (V1) is still shown if QGC hasn't disabled it yet (race condition on first connect).
+- As battery decreases: voice alert "battery level low" when % drops to 25 %, and "battery level critical" when % drops to 10 %.
+- Use `--fast` to cycle battery quickly (~30 s) and verify both alerts fire: `python3 battery_test_mavsdk.py --v2 --fast`.
 
 **`--v2 --fault`**
 
