@@ -101,6 +101,8 @@ These scenarios require manual verification or a more complex test harness:
 
 - **MAVLink string field boundary**: All names used by this script are well under the field limit (`name` ≤ 50 B, `serial_number` ≤ 32 B, `manufacture_date` ≤ 9 B). A sender that fills an entire field without a null terminator is not exercised. To verify: use a flight-stack simulator that sends a 50-character battery name and confirm QGC displays it correctly without garbage characters.
 
+- **First-message CHARGING suppressing later alerts**: The `--fast` cycle always starts at 95 % → `chargeState = OK`, which correctly seeds QGC's alert-tracking map. A vehicle that is first seen while charging (V1 `charge_state = MAV_BATTERY_CHARGE_STATE_CHARGING = 7`) and then disconnected from the charger before a single `OK` message is received was not exercised. To verify manually: connect QGC while the vehicle reports CHARGING, unplug the charger, then drain the battery past the LOW threshold and confirm the voice alert fires.
+
 ## Failure modes
 
 - **QGC shows no battery at all**: `mavsdk_server` did not connect.
