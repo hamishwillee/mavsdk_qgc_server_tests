@@ -93,6 +93,14 @@ Press **Ctrl+C** to stop.
 
 - QGC shows two battery entries (Battery 0 and Battery 1) with slightly different voltages (+0.05 V per id).
 
+## Known test coverage gaps
+
+These scenarios require manual verification or a more complex test harness:
+
+- **Component-ID scoping of V2 activation**: The script acts as a single autopilot component. It cannot simulate a camera peripheral (different `compid`) sending BATTERY_STATUS_V2 at the same time as the autopilot sends BATTERY_STATUS. To verify this manually: attach a real camera that emits BATTERY_STATUS_V2 while the autopilot only emits BATTERY_STATUS and confirm QGC still shows the autopilot battery via V1.
+
+- **MAVLink string field boundary**: All names used by this script are well under the field limit (`name` ≤ 50 B, `serial_number` ≤ 32 B, `manufacture_date` ≤ 9 B). A sender that fills an entire field without a null terminator is not exercised. To verify: use a flight-stack simulator that sends a 50-character battery name and confirm QGC displays it correctly without garbage characters.
+
 ## Failure modes
 
 - **QGC shows no battery at all**: `mavsdk_server` did not connect.
