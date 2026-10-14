@@ -1,0 +1,24 @@
+name: multi_source_parallel
+description: |
+  Three batteries in parallel on one propulsion bus, reported as one pooled energy
+  system (aggregate: weighted, as ArduPilot's Sum battery monitor does). The batteries
+  have different capacities and levels, so the system % differs from each battery's %.
+  ES1 reports the same batteries with aggregate: min (worst case, as PX4 does) to show
+  that a GCS must display the system's reported value, not recompute it.
+  Expect: ES0 % is the capacity-weighted mean; ES1 % is the lowest battery.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    aggregate: weighted
+    endurance: 30m
+  - index: 1
+    flags: [PROPULSION, AVIONICS]
+    aggregate: min
+    endurance: 30m
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], capacity_ah: 16, cells: 6, profile: {start: 95, end: 20, period: 3m}}
+    - {id: 1, energy_systems: [PROPULSION], capacity_ah: 16, cells: 6, profile: {start: 90, end: 15, period: 3m}}
+    - {id: 2, energy_systems: [PROPULSION], capacity_ah: 5,  cells: 6, profile: {start: 70, end: 2,  period: 3m}}

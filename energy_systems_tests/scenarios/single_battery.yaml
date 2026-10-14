@@ -1,0 +1,18 @@
+name: single_battery
+description: |
+  Docs example "Single Energy Source/Battery System": one energy system covering
+  propulsion and avionics, fed by a single battery.
+  Expect: one energy-system indicator (propulsion icon) whose drop-down lists Battery 0.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION, AVIONICS]
+    endurance: 20m              # remaining_time = 20 min at 100 %
+
+sources:
+  batteries:
+    - id: 0
+      energy_systems: [PROPULSION, AVIONICS]
+      capacity_ah: 5.0
+      cells: 4
+      profile: {start: 95, end: 5, period: 3m}

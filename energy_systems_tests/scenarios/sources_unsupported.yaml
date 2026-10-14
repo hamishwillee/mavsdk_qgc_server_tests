@@ -1,0 +1,25 @@
+name: sources_unsupported
+description: |
+  Energy systems are computed from real batteries and fuel, but the vehicle doesn't
+  expose them: BATTERY_INFO and FUEL_INFORMATION_V2 requests (and their status
+  intervals) are NACKed UNSUPPORTED.
+  Expect: energy-system indicators work normally; drop-downs show no sources; no
+  error or retry storm from QGC.
+
+behaviour:
+  sources: unsupported
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    endurance: 20m
+  - index: 1
+    flags: [AVIONICS]
+    endurance: 60m
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], profile: {start: 95, end: 10, period: 3m}}
+    - {id: 1, energy_systems: [AVIONICS], capacity_ah: 2, cells: 3, profile: {start: 99, end: 75, period: 3m}}
+  fuel:
+    - {id: 0, energy_systems: [PROPULSION], fuel_type: LIQUID, maximum_fuel: 10000}

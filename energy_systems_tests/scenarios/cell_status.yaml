@@ -1,0 +1,19 @@
+name: cell_status
+description: |
+  BATTERY_CELL_STATUS: Battery 0 is 12S, so it needs two instances (cells_instance 0
+  covers cells 1-6, cells_instance 1 covers cells 7-12). Battery 1 is 4S, one
+  instance with the last two voltages UINT16_MAX (not used). Battery 2 has no cell data.
+  Expect: per-cell voltages in the drop-down for Battery 0 (12 cells) and Battery 1 (4 cells).
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION, AVIONICS]
+    endurance: 20m
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], capacity_ah: 22, cells: 12, cell_status: true,
+       profile: {start: 95, end: 20, period: 3m}}
+    - {id: 1, energy_systems: [AVIONICS], capacity_ah: 2, cells: 4, cell_status: true,
+       profile: {start: 99, end: 80, period: 3m}}
+    - {id: 2, energy_systems: [AVIONICS], capacity_ah: 2, cells: 4}

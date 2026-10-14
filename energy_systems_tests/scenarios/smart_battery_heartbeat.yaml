@@ -1,0 +1,24 @@
+name: smart_battery_heartbeat
+description: |
+  A smart battery (component 181) that announces itself with a HEARTBEAT (MAV_TYPE_BATTERY)
+  but streams nothing until asked: QGC can only find it from the heartbeat.
+  Expect: QGC requests BATTERY_INFO from component 181 after seeing its heartbeat; the battery
+  then appears (static info only, as nothing requests its status) under propulsion.
+
+components:
+  181: {heartbeat: true, stream_status: false}
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    endurance: 25m
+
+sources:
+  batteries:
+    - id: 0
+      component: 181
+      energy_systems: [PROPULSION]
+      capacity_ah: 12
+      cells: 12
+      profile: {start: 90, end: 10, period: 3m}
+      info: {name: Acme_SmartHV12S}

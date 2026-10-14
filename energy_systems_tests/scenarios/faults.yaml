@@ -1,0 +1,43 @@
+name: faults
+description: |
+  Source-level faults, separate from energy-system severity:
+    20 s: Battery 0 FAULT_OVER_TEMPERATURE + NOT_READY_TO_USE
+    30 s: Fuel 0 LEAK_DETECTED; 40 s: Fuel 0 SENSOR_FAULT
+    60 s: all faults cleared (then the sequence repeats every 70 s)
+  Battery 1 always reports CHARGING and CELL_BALANCING and TRACKS_CHARGE (non-fault flags).
+  Expect: faults appear in the drop-down on the affected source only. They don't change
+  the energy system's severity and aren't announced.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    endurance: 20m
+  - index: 1
+    flags: [AVIONICS]
+    endurance: 60m
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], profile: {start: 95, end: 50, period: 3m}}
+    - {id: 1, energy_systems: [AVIONICS], capacity_ah: 2, cells: 3,
+       status_flags: [CHARGING, CELL_BALANCING, TRACKS_CHARGE], profile: {start: 60, end: 90, period: 3m}}
+  fuel:
+    - {id: 0, energy_systems: [PROPULSION], fuel_type: LIQUID, maximum_fuel: 10000,
+       profile: {start: 100, end: 50, period: 3m}}
+
+timeline:
+  - at: 20s
+    repeat: 70s
+    set: {battery: 0, add_flags: [FAULT_OVER_TEMPERATURE, NOT_READY_TO_USE]}
+  - at: 30s
+    repeat: 70s
+    set: {fuel: 0, add_flags: [LEAK_DETECTED]}
+  - at: 40s
+    repeat: 70s
+    set: {fuel: 0, add_flags: [SENSOR_FAULT]}
+  - at: 60s
+    repeat: 70s
+    description: faults cleared
+    set:
+      - {battery: 0, status_flags: 0}
+      - {fuel: 0, status_flags: 0}

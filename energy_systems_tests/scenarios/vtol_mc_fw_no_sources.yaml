@@ -1,0 +1,33 @@
+name: vtol_mc_fw_no_sources
+description: |
+  VTOL MC/FW energy systems with only the energy systems exposed (source requests NACKed).
+  Transitions every 40 s toggle INACTIVE between the two systems.
+  Expect: two propulsion indicators, one greyed at a time; empty drop-downs.
+
+behaviour:
+  sources: unsupported
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION_VTOL_MC]
+    profile: {start: 95, end: 5, period: 4m}
+    endurance: 6m
+  - index: 1
+    flags: [PROPULSION_VTOL_FW]
+    profile: {start: 95, end: 20, period: 4m}
+    endurance: 45m
+    status_flags: [INACTIVE]
+
+timeline:
+  - at: 40s
+    repeat: 80s
+    description: transition to FW
+    set:
+      - {es: 0, add_flags: [INACTIVE]}
+      - {es: 1, clear_flags: [INACTIVE]}
+  - at: 80s
+    repeat: 80s
+    description: transition back to MC
+    set:
+      - {es: 0, clear_flags: [INACTIVE]}
+      - {es: 1, add_flags: [INACTIVE]}

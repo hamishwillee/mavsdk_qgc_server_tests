@@ -1,0 +1,15 @@
+name: single_battery_no_sources
+description: |
+  Docs example "Single Energy Source/Battery System", but the vehicle only exposes
+  the energy system: BATTERY_INFO/FUEL_INFORMATION_V2 requests are NACKed (UNSUPPORTED).
+  Expect: one propulsion indicator with % and time; drop-down shows no sources (and
+  QGC must not treat the source NACKs as a failure of the protocol).
+
+behaviour:
+  sources: unsupported
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION, AVIONICS]
+    profile: {start: 95, end: 5, period: 3m}
+    endurance: 20m

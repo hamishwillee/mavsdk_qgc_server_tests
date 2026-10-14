@@ -1,0 +1,20 @@
+name: legacy_until_disabled
+description: |
+  The vehicle supports both protocols and streams legacy BATTERY_STATUS until the GCS
+  disables it (SET_MESSAGE_INTERVAL(BATTERY_STATUS, -1)), as the docs say a GCS should
+  once energy systems are confirmed.
+  Expect: the simulator logs "[LEGACY] BATTERY_STATUS stream OFF"; QGC shows only the
+  energy-system indicator and doesn't announce legacy battery alerts, even before the
+  legacy stream stops.
+
+behaviour:
+  legacy_battery_status: until_disabled
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION, AVIONICS]
+    endurance: 20m
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION, AVIONICS], profile: {start: 95, end: 5, period: 3m}}

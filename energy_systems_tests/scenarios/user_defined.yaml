@@ -1,0 +1,38 @@
+name: user_defined
+description: |
+  User-defined energy systems with names from ENERGY_SYSTEM_INFO.energy_system_name:
+    ES1 USER_DEFINED1 "Winch & Tether Power Unit": exactly 25 bytes, so no terminator
+        on the wire. Flight-critical.
+    ES2 USER_DEFINED2 "Nutzlast-Kühlung": UTF-8 (ü is 2 bytes). Not flight-critical.
+    ES3 USER_DEFINED3 "照明系统": UTF-8, 3-byte characters (12 bytes).
+    ES4 USER_DEFINED4 with an empty name: QGC needs a generic fallback label.
+  Battery 1 feeds both ES1 and ES2.
+  Expect: names shown exactly, no garbage after the 25-byte name. ES1 alerts are
+  flight-critical; ES2/ES3/ES4 alerts are "important" only.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    endurance: 20m
+  - index: 1
+    flags: [USER_DEFINED1]
+    name: "Winch & Tether Power Unit"
+    status_flags: [FLIGHT_CRITICAL]
+    endurance: 15m
+  - index: 2
+    flags: [USER_DEFINED2]
+    name: "Nutzlast-Kühlung"
+    endurance: 40m
+  - index: 3
+    flags: [USER_DEFINED3]
+    name: "照明系统"
+    profile: {start: 80, end: 10, period: 2m}
+  - index: 4
+    flags: [USER_DEFINED4]
+    profile: {start: 50, end: 40, period: 2m}
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], capacity_ah: 8, cells: 6, profile: {start: 95, end: 40, period: 3m}}
+    - {id: 1, energy_systems: [USER_DEFINED1, USER_DEFINED2], capacity_ah: 4, cells: 4, current_a: 8,
+       profile: {start: 90, end: 4, period: 2m}}
