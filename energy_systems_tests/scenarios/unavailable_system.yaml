@@ -1,0 +1,26 @@
+name: unavailable_system
+description: |
+  ES1 (payload) is UNAVAILABLE from the start. ES0 (propulsion) becomes UNAVAILABLE
+  at 30 s (e.g. battery disconnected, arming blocked) and available again at 50 s.
+  Expect: UNAVAILABLE is shown on the indicator but not announced.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    endurance: 20m
+  - index: 1
+    flags: [PAYLOAD]
+    status_flags: [UNAVAILABLE]
+    profile: 0
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], profile: {start: 95, end: 30, period: 3m}}
+
+timeline:
+  - at: 30s
+    repeat: 60s
+    set: {es: 0, add_flags: [UNAVAILABLE]}
+  - at: 50s
+    repeat: 60s
+    set: {es: 0, clear_flags: [UNAVAILABLE]}

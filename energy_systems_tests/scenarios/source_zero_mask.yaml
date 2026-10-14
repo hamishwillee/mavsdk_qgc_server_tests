@@ -1,0 +1,24 @@
+name: source_zero_mask
+description: |
+  Battery 1 has BATTERY_INFO.energy_systems = 0 ("field not provided"; the XML says a
+  consumer may guess from battery_function). Its battery_function is AVIONICS.
+  Fuel 0 also has energy_systems = 0.
+  Expect: QGC doesn't crash; the zero-mask sources are not listed under any system by
+  the AND rule (or listed under avionics if QGC implements the battery_function guess),
+  and are still visible somewhere (e.g. an "Other sources" group).
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    endurance: 20m
+  - index: 1
+    flags: [AVIONICS]
+    aggregate: explicit
+    profile: {start: 99, end: 80, period: 3m}
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], profile: {start: 95, end: 10, period: 3m}}
+    - {id: 1, energy_systems: 0, capacity_ah: 1, cells: 2, info: {battery_function: AVIONICS}}
+  fuel:
+    - {id: 0, energy_systems: 0, fuel_type: LIQUID, maximum_fuel: 2000}

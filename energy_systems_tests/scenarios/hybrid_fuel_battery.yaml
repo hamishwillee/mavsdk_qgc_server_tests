@@ -1,0 +1,32 @@
+name: hybrid_fuel_battery
+description: |
+  Hybrid vehicle: propulsion is fed by a liquid fuel tank and a gas (hydrogen) tank
+  plus a buffer battery; avionics has its own battery. A third, UNKNOWN-type (normalized)
+  fuel source feeds the payload.
+  Expect: propulsion drop-down lists Fuel 0 (LIQUID, ml), Fuel 1 (GAS, kPa) and Battery 0;
+  units shown per fuel type; payload lists Fuel 2.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    endurance: 3h
+  - index: 1
+    flags: [AVIONICS]
+    endurance: 5h
+  - index: 2
+    flags: [PAYLOAD]
+    endurance: 2h
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], capacity_ah: 5, cells: 12, current_a: 5,
+       profile: {start: 90, end: 60, period: 5m}}
+    - {id: 1, energy_systems: [AVIONICS], capacity_ah: 3, cells: 4, current_a: 1.5,
+       profile: {start: 97, end: 80, period: 5m}}
+  fuel:
+    - {id: 0, energy_systems: [PROPULSION], fuel_type: LIQUID, maximum_fuel: 25000,
+       profile: {start: 100, end: 10, period: 4m}}
+    - {id: 1, energy_systems: [PROPULSION], fuel_type: GAS, maximum_fuel: 30000, flow_rate: 12.5,
+       temperature_k: 288.0, profile: {start: 85, end: 30, period: 4m}}
+    - {id: 2, energy_systems: [PAYLOAD], fuel_type: UNKNOWN, maximum_fuel: 1,
+       profile: {start: 70, end: 20, period: 4m}}

@@ -1,0 +1,30 @@
+name: nan_fields
+description: |
+  "Not provided" values:
+    ES0: remaining_time NaN (no endurance)
+    ES1: remaining_capacity NaN and remaining_time NaN (system only reports flags);
+         severity forced to LOW by the timeline at 20 s
+    Battery 0: state_of_charge UINT16_MAX
+    Fuel 0: percent_remaining UINT16_MAX, flow_rate NaN, temperature NaN
+  Expect: QGC shows "--" (or omits) for missing values, never 0 % or NaN text, and
+  still announces ES1 going LOW.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+  - index: 1
+    flags: [AVIONICS]
+    aggregate: explicit
+    profile: 50
+    report_percent: false
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], report_level: false}
+  fuel:
+    - {id: 0, energy_systems: [AVIONICS], fuel_type: LIQUID, maximum_fuel: 5000,
+       report_level: false, flow_rate: .nan, temperature_k: .nan}
+
+timeline:
+  - at: 20s
+    set: {es: 1, auto_severity: false, status_flags: [LOW]}

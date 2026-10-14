@@ -1,0 +1,27 @@
+name: rejoin
+description: |
+  Rejoin flow: the vehicle already streams ENERGY_SYSTEM_STATUS, BATTERY_STATUS_V2 and
+  FUEL_STATUS_V2 by default (e.g. another GCS requested them) before QGC asks.
+  Expect: QGC shows status as soon as it has the matching _INFO; it still runs the
+  connection flow (one-shot _INFO requests), which may change stream rates.
+
+behaviour:
+  stream_by_default:
+    ENERGY_SYSTEM_STATUS: 1s
+    BATTERY_STATUS_V2: 1s
+    FUEL_STATUS_V2: 1s
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    endurance: 20m
+  - index: 1
+    flags: [AVIONICS]
+    endurance: 60m
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], profile: {start: 95, end: 10, period: 3m}}
+    - {id: 1, energy_systems: [AVIONICS], capacity_ah: 2, cells: 3, profile: {start: 99, end: 75, period: 3m}}
+  fuel:
+    - {id: 0, energy_systems: [PROPULSION], fuel_type: LIQUID, maximum_fuel: 10000}

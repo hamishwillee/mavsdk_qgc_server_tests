@@ -1,0 +1,32 @@
+name: smart_battery
+description: |
+  A smart battery on its own component (MAV_COMP_ID_BATTERY = 180) plus an autopilot power
+  monitor, both feeding propulsion. The smart battery uses battery id 0, the same id as the
+  autopilot's monitor: instances are only unique per component. The smart battery sends no
+  ENERGY_SYSTEM_* messages (it is a source, not a system): it streams BATTERY_STATUS_V2
+  unprompted and sends BATTERY_INFO (with its configured energy_systems) only when asked.
+  The autopilot aggregates both into the propulsion energy system.
+  Expect: QGC requests BATTERY_INFO from component 180 once, on first sight of its status.
+  The propulsion drop-down lists both "id 0" batteries, the smart one marked "component 180".
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION, AVIONICS]
+    endurance: 25m
+
+sources:
+  batteries:
+    - id: 0
+      component: 180
+      energy_systems: [PROPULSION, AVIONICS]
+      capacity_ah: 10
+      cells: 6
+      status_flags: [TRACKS_CHARGE]
+      cell_status: true
+      profile: {start: 95, end: 10, period: 3m}
+      info: {name: Acme_Smart6S10000, type: LION}
+    - id: 0
+      energy_systems: [PROPULSION, AVIONICS]
+      capacity_ah: 10
+      cells: 6
+      profile: {start: 93, end: 12, period: 3m}

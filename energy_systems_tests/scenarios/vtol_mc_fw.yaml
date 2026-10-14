@@ -1,0 +1,46 @@
+name: vtol_mc_fw
+description: |
+  Docs example "VTOL: Custom Energy Sources": separate propulsion energy systems for
+  MC (hover) and FW (forward flight) modes. One battery feeds both; a fuel tank feeds
+  only FW. The vehicle transitions every 40 s, marking the system for the mode not in
+  use INACTIVE.
+  Expect: two propulsion indicators. The inactive one is greyed with no values and
+  never announces. The battery appears under both systems; the fuel tank only under FW.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION_VTOL_MC]
+    endurance: 6m                 # hover is expensive
+  - index: 1
+    flags: [PROPULSION_VTOL_FW]
+    endurance: 45m
+    status_flags: [INACTIVE]      # starts in MC mode
+
+sources:
+  batteries:
+    - id: 0
+      energy_systems: [PROPULSION_VTOL_MC, PROPULSION_VTOL_FW]
+      capacity_ah: 16.0
+      cells: 12
+      current_a: 40
+      profile: {start: 95, end: 5, period: 4m}
+  fuel:
+    - id: 0
+      energy_systems: [PROPULSION_VTOL_FW]
+      fuel_type: LIQUID
+      maximum_fuel: 8000          # ml
+      profile: {start: 100, end: 20, period: 4m}
+
+timeline:
+  - at: 40s
+    repeat: 80s
+    description: transition to FW
+    set:
+      - {es: 0, add_flags: [INACTIVE]}
+      - {es: 1, clear_flags: [INACTIVE]}
+  - at: 80s
+    repeat: 80s
+    description: transition back to MC
+    set:
+      - {es: 0, clear_flags: [INACTIVE]}
+      - {es: 1, add_flags: [INACTIVE]}

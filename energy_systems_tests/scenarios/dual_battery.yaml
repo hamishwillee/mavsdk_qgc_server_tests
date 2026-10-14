@@ -1,0 +1,29 @@
+name: dual_battery
+description: |
+  Docs example "Dual Source/Battery System": propulsion and avionics are separate
+  energy systems, each fed by its own battery.
+  Expect: two indicators (propulsion, avionics). Each drop-down lists only its own battery.
+  The propulsion battery drains much faster, so only propulsion reaches LOW/CRITICAL/EMERGENCY.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    endurance: 25m
+  - index: 1
+    flags: [AVIONICS]
+    endurance: 2h
+
+sources:
+  batteries:
+    - id: 0
+      energy_systems: [PROPULSION]
+      capacity_ah: 10.0
+      cells: 6
+      current_a: 30
+      profile: {start: 95, end: 2, period: 4m}
+    - id: 1
+      energy_systems: [AVIONICS]
+      capacity_ah: 2.2
+      cells: 3
+      current_a: 1.2
+      profile: {start: 98, end: 60, period: 4m}

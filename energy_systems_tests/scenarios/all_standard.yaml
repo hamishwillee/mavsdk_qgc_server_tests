@@ -1,0 +1,37 @@
+name: all_standard
+description: |
+  One energy system per standard function plus a combined "all" system:
+    ES0 PROPULSION, ES1 AVIONICS, ES2 PAYLOAD, ES3 PROPULSION|AVIONICS|PAYLOAD.
+  ES2 (payload) is not flight-critical until 60 s, when FLIGHT_CRITICAL is set.
+  ES3 uses the worst of all three batteries (aggregate: min).
+  Expect: four indicators with distinct icons (ES3 uses the most important function,
+  propulsion). Payload LOW/CRITICAL announcements are "important" before 60 s and
+  flight-critical after. ES3's drop-down lists all three batteries.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    endurance: 20m
+  - index: 1
+    flags: [AVIONICS]
+    endurance: 90m
+  - index: 2
+    flags: [PAYLOAD]
+    endurance: 30m
+  - index: 3
+    flags: [PROPULSION, AVIONICS, PAYLOAD]
+    endurance: 20m
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], capacity_ah: 10, cells: 6, current_a: 25,
+       profile: {start: 95, end: 30, period: 3m}}
+    - {id: 1, energy_systems: [AVIONICS], capacity_ah: 2, cells: 3, current_a: 1,
+       profile: {start: 98, end: 70, period: 3m}}
+    - {id: 2, energy_systems: [PAYLOAD], capacity_ah: 3, cells: 4, current_a: 6,
+       profile: {start: 90, end: 3, period: 3m}}
+
+timeline:
+  - at: 60s
+    description: payload becomes flight-critical
+    set: {es: 2, add_flags: [FLIGHT_CRITICAL]}

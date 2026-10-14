@@ -1,0 +1,20 @@
+name: source_in_two_systems
+description: |
+  One battery feeds two energy systems (propulsion and avionics), and a second battery
+  feeds avionics only.
+  Expect: Battery 0 is listed under both ES0 and ES1; Battery 1 only under ES1.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    endurance: 20m
+  - index: 1
+    flags: [AVIONICS]
+    endurance: 60m
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION, AVIONICS], capacity_ah: 10, cells: 6,
+       profile: {start: 95, end: 10, period: 3m}}
+    - {id: 1, energy_systems: [AVIONICS], capacity_ah: 1.5, cells: 2, current_a: 0.5,
+       profile: {start: 99, end: 90, period: 3m}}

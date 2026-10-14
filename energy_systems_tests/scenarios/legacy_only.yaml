@@ -1,0 +1,17 @@
+name: legacy_only
+description: |
+  A vehicle that doesn't implement the Energy Systems Protocol: REQUEST_MESSAGE
+  (ENERGY_SYSTEM_INFO) is NACKed with UNSUPPORTED, and the vehicle streams legacy
+  BATTERY_STATUS for two batteries.
+  Expect: QGC falls back to the existing battery indicator and battery alerts; no
+  energy-system indicator appears.
+
+behaviour:
+  energy_systems: unsupported
+  sources: unsupported
+  legacy_battery_status: on
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], profile: {start: 95, end: 5, period: 3m}}
+    - {id: 1, energy_systems: [AVIONICS], capacity_ah: 2, cells: 3, profile: {start: 99, end: 70, period: 3m}}

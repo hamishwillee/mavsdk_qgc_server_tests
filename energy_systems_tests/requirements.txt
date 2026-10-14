@@ -1,0 +1,7 @@
+# gRPC MAVSDK-Python wrapper (bundles mavsdk_server). It was renamed from `mavsdk` when
+# `mavsdk` 4.x became the native binding with a different API; energy_sim.py also accepts
+# `mavsdk>=3.15.3,<4`.
+mavsdk-grpc>=4.0
+PyYAML>=6.0
+# Packs BATTERY_INFO (see RAW_MESSAGES in energy_sim.py) and decodes in tools/fake_gcs.py
+pymavlink>=2.4.40

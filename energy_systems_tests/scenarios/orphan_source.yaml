@@ -1,0 +1,15 @@
+name: orphan_source
+description: |
+  Battery 1 says it feeds PAYLOAD, but there is no payload energy system.
+  Expect: Battery 1 isn't listed under propulsion; QGC copes with a source that matches
+  no system (e.g. lists it under "Other sources") and doesn't invent a payload system.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION, AVIONICS]
+    endurance: 20m
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION, AVIONICS], profile: {start: 95, end: 10, period: 3m}}
+    - {id: 1, energy_systems: [PAYLOAD], capacity_ah: 2, cells: 3, profile: {start: 80, end: 40, period: 3m}}

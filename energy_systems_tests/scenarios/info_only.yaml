@@ -1,0 +1,21 @@
+name: info_only
+description: |
+  Sources are discoverable (BATTERY_INFO, FUEL_INFORMATION_V2 are sent on request) but
+  their status streams are not supported (SET_MESSAGE_INTERVAL for BATTERY_STATUS_V2,
+  BATTERY_CELL_STATUS, FUEL_STATUS_V2 is NACKed UNSUPPORTED).
+  Expect: drop-down lists the sources with static info (name, capacity, fuel type) and
+  no live values; QGC doesn't wait for or keep re-requesting the status streams.
+
+behaviour:
+  sources: info_only
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION, AVIONICS]
+    endurance: 20m
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION, AVIONICS], cell_status: true}
+  fuel:
+    - {id: 0, energy_systems: [PROPULSION], fuel_type: GAS, maximum_fuel: 30000}
