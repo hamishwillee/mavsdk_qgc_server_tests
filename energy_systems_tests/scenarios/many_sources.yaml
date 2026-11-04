@@ -1,0 +1,50 @@
+name: many_sources
+description: |
+  Five sources on one energy system: propulsion is fed by three named batteries and two
+  fuel tanks (aggregate: min, so the system % is the lowest source). Avionics and payload
+  each have their own battery, so the drop-down also has several system tabs.
+  The sources drain at different rates, so the lowest one changes during the run:
+    Reserve pack starts lowest (60%) and drains fastest; Gas tank overtakes it later.
+    30 s: Rear pack FAULT_OVER_TEMPERATURE (cleared at 90 s; repeats every 120 s).
+  Expect: the propulsion tab has five source tabs (three batteries, Liquid fuel, Gas fuel),
+  opening on the lowest % at the moment the drop-down is opened. Rear pack's % badge is red
+  while its fault is set. Once propulsion goes LOW (25%) the drop-down opens on propulsion.
+
+energy_systems:
+  - index: 0
+    flags: [PROPULSION]
+    aggregate: min
+    endurance: 25m
+  - index: 1
+    flags: [AVIONICS]
+    endurance: 60m
+  - index: 2
+    flags: [PAYLOAD]
+    endurance: 40m
+
+sources:
+  batteries:
+    - {id: 0, energy_systems: [PROPULSION], capacity_ah: 16, cells: 6, info: {name: Front pack},
+       profile: {start: 95, end: 40, period: 6m}}
+    - {id: 1, energy_systems: [PROPULSION], capacity_ah: 16, cells: 6, info: {name: Rear pack},
+       profile: {start: 88, end: 35, period: 6m}}
+    - {id: 2, energy_systems: [PROPULSION], capacity_ah: 5, cells: 6, info: {name: Reserve pack},
+       profile: {start: 60, end: 30, period: 6m}}
+    - {id: 3, energy_systems: [AVIONICS], capacity_ah: 3, cells: 4, info: {name: Avionics},
+       profile: {start: 97, end: 80, period: 6m}}
+    - {id: 4, energy_systems: [PAYLOAD], capacity_ah: 4, cells: 4, info: {name: Payload},
+       profile: {start: 70, end: 45, period: 6m}}
+  fuel:
+    - {id: 0, energy_systems: [PROPULSION], fuel_type: LIQUID, maximum_fuel: 25000,
+       profile: {start: 100, end: 45, period: 6m}}
+    - {id: 1, energy_systems: [PROPULSION], fuel_type: GAS, maximum_fuel: 30000, flow_rate: 12.5,
+       temperature_k: 288.0, profile: {start: 80, end: 10, period: 6m}}
+
+timeline:
+  - at: 30s
+    repeat: 120s
+    set: {battery: 1, add_flags: [FAULT_OVER_TEMPERATURE]}
+  - at: 90s
+    repeat: 120s
+    description: fault cleared
+    set: {battery: 1, status_flags: 0}
